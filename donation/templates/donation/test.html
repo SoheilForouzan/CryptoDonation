@@ -1,6 +1,6 @@
 {% load static %}
 <p>{{ address }}</p>
-<img src="{% static 'donation/eths.png' %}" alt="qrcode" style="width: 500px; height: 500px;">
+<img src="{{ qrcode }}" alt="qrcode" style="width: 500px; height: 500px;">
 
 <script>
     //check balance of a btc wallet every 2 seconds 
