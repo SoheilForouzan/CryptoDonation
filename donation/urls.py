@@ -1,0 +1,8 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('btc', views.BTCDonation, name='BTCDonation'),
+    path('eth', views.ETHDonation, name='ETHDonation'),
+    
+]
