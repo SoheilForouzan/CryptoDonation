@@ -5,18 +5,19 @@ from PIL import Image
 from PIL import ImageDraw
 from eth_account import Account
 import secrets
+from tronpy import Tron
 
 # BTC
 
 
 def BTCDonation(request):
     # generate a btc wallet with bitcoinlib
-    wallet = Wallet.create(f'{secrets.token_hex(32)}')
+    wallet = Wallet.create(f'{secrets.token_hex(32)}', network='tron')
     key1 = wallet.get_key()
     address = key1.address
 
     # Generate a payment request with qrcode
-    payment_request = "bitcoin:" + address + "?amount=0.01"
+    payment_request = "tron:" + address + "?amount=0.01"
     qrmake = qrcode.make(payment_request)
     qrmake.save('donation/static/donation/btcs.png')
     qrpath = f'static/donation/btcs.png'
@@ -73,35 +74,41 @@ def ETHDonation(request):
 
 # USDT
 def USDTDonation(request):
-    # Generate a usdt wallet address for the user
-    wallet = Wallet.create(f'{secrets.token_hex(32)}')
-    key1 = wallet.get_key()
-    address = key1.address
+
+    # Connecting to the Tron blockchain
+    client = Tron()
+    # Generate a USDT wallet address for the user
+    wallet = client.generate_address()
+    address = wallet['base58check_address']
+    private_key = wallet['private_key']
 
     # Generate a payment request with qrcode
-    payment_request = "ethereum:" + address + "?amount=0.01"
+    payment_request = "tron:" + address + "?amount=0.01"
     qrmake = qrcode.make(payment_request)
-    qrmake.save('donation/static/donation/usdts.png')
-    qrpath = f'static/donation/usdts.png'
+    qrmake.save('donation/static/donation/trxs.png')
+    qrpath = f'static/donation/trxs.png'
 
     # Generate a transaction
 
-    # destination = "0x00bf6C66241897CB5E3d3819f3B87240453e86D3"
-    # tx = Transaction(
-    #     nonce=0,
-    #     gas_price=10000000000,
-    #     gas=21000,
-    #     to=destination,
-    #     value=10000000000,
-    #     data=b'',
-    #     chain_id=1
+    #destination = "TXr1G9jBDhVg6AoBFL7EuPxZzRAu5xDqJm"
+    # transaction = (
+    #    client.trx.transfer(
+    #        address,
+    #        destination,
+    #        13
+    #    )
+    #    .memo("Donation")
+    #    .build()
+    #    .inspect()
+    #    .sign(private_key)
+    #    .broadcast()
     # )
-    # tx.sign(private_key)
-    # tx_signed = tx.raw
+    # transaction.wait()
 
     context = {
-        'qrcode': qrpath,
         'address': address,
+        'private_key': private_key,
+        'qrcode': qrpath,
     }
 
     return render(request, 'donation/test.html', context)
